@@ -10,7 +10,7 @@ def twitter
     config.consumer_secret = ENV['ISAAC_TWITTER_SECRET']
   end
 
-  Twitter.user_timeline('icambron', count: 5).each do |tweet|
+  Twitter.user_timeline('icambron', count: 10).each do |tweet|
     tweets << {created_at: tweet.created_at, text: tweet.text}
   end
 
@@ -30,8 +30,9 @@ def github
     summary =
       case event.type
       when 'IssueCommentEvent'
+        next unless event.payload.action == "created"
         {
-          action: event.payload.action,
+          repo: { name: event.repo.name, url: "https://github.com/#{event.repo.name}" },
           issue: {
             number: event.payload.issue.number,
             title: event.payload.issue.title
@@ -41,12 +42,14 @@ def github
         }
 
       when 'PullRequestEvent'
+        next unless event.payload.action == "opened"
         {
           repo: { name: event.repo.name, url: "https://github.com/#{event.repo.name}" },
           number: event.payload.number,
           url: event.payload.pull_request.html_url,
           comment: event.payload.pull_request.body,
-          commits: event.payload.pull_request.commits
+          commits: event.payload.pull_request.commits,
+          title: event.payload.pull_request.title
         }
 
       when 'PushEvent'
@@ -63,10 +66,11 @@ def github
     activities << summary
   end
 
-  activities
+  activities.take(10)
 end
 
 def upload(hash)
+
   connection = Fog::Storage.new({
     provider: 'AWS',
     aws_access_key_id: ENV['ISAAC_S3_ID'],
@@ -77,7 +81,8 @@ def upload(hash)
   dir.files.create({
     key: 'isaac.json',
     body: hash.to_json,
-    public: true
+    public: true,
+    content_type: "application/json"
   })
 end
 
