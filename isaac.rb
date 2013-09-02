@@ -10,9 +10,11 @@ def twitter
     config.consumer_secret = ENV['ISAAC_TWITTER_SECRET']
   end
 
+  puts "Requesting Twitter"
   Twitter.user_timeline('icambron', count: 10).each do |tweet|
     tweets << {created_at: tweet.created_at, text: tweet.text}
   end
+  puts "Processed Twitter"
 
   tweets
 end
@@ -25,6 +27,7 @@ def github
     config.oauth_token = ENV['ISAAC_GITHUB_TOKEN']
   end
 
+  puts "Requesting Github"
   Github.activity.events.performed('icambron', public: true) do |event|
 
     summary =
@@ -66,6 +69,7 @@ def github
     activities << summary
   end
 
+  puts "Processed Github"
   activities.take(10)
 end
 
@@ -78,12 +82,15 @@ def upload(hash)
   })
 
   dir = connection.directories.get('isaac-as-a-service')
+
+  puts "Uploading to S3"
   dir.files.create({
     key: 'isaac.json',
     body: hash.to_json,
     public: true,
     content_type: "application/json"
   })
+  puts "Finished uploading"
 end
 
 results = {}
