@@ -10,11 +10,11 @@ def twitter
     config.consumer_secret = ENV['ISAAC_TWITTER_SECRET']
   end
 
-  puts "Requesting Twitter"
+  puts 'Requesting Twitter'
   Twitter.user_timeline('icambron', count: 10).each do |tweet|
     tweets << {created_at: tweet.created_at, text: tweet.text}
   end
-  puts "Processed Twitter"
+  puts 'Processed Twitter'
 
   tweets
 end
@@ -27,15 +27,14 @@ def github
     config.oauth_token = ENV['ISAAC_GITHUB_TOKEN']
   end
 
-  puts "Requesting Github"
+  puts 'Requesting Github'
   Github.activity.events.performed('icambron', public: true) do |event|
 
     summary =
       case event.type
       when 'IssueCommentEvent'
-        next unless event.payload.action == "created"
+        next unless event.payload.action == 'created'
         {
-          repo: { name: event.repo.name, url: "https://github.com/#{event.repo.name}" },
           issue: {
             number: event.payload.issue.number,
             title: event.payload.issue.title
@@ -45,9 +44,8 @@ def github
         }
 
       when 'PullRequestEvent'
-        next unless event.payload.action == "opened"
+        next unless event.payload.action == 'opened'
         {
-          repo: { name: event.repo.name, url: "https://github.com/#{event.repo.name}" },
           number: event.payload.number,
           url: event.payload.pull_request.html_url,
           comment: event.payload.pull_request.body,
@@ -57,19 +55,19 @@ def github
 
       when 'PushEvent'
         {
-           repo: { name: event.repo.name, url: "https://github.com/#{event.repo.name}" },
            commits: event.payload.commits.size
         }
       else
         next
       end
 
+    summary[:repo] = { name: event.repo.name, url: "https://github.com/#{event.repo.name}" },
     summary[:type] = event.type
     summary[:created_at] = event.created_at
     activities << summary
   end
 
-  puts "Processed Github"
+  puts 'Processed Github'
   activities.take(10)
 end
 
@@ -83,14 +81,14 @@ def upload(hash)
 
   dir = connection.directories.get('isaac-as-a-service')
 
-  puts "Uploading to S3"
+  puts 'Uploading to S3'
   dir.files.create({
     key: 'isaac.json',
     body: hash.to_json,
     public: true,
-    content_type: "application/json"
+    content_type: 'application/json'
   })
-  puts "Finished uploading"
+  puts 'Finished uploading'
 end
 
 results = {}
