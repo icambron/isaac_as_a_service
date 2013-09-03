@@ -61,7 +61,7 @@ def github
         next
       end
 
-    summary[:repo] = { name: event.repo.name, url: "https://github.com/#{event.repo.name}" },
+    summary[:repo] = { name: event.repo.name, url: "https://github.com/#{event.repo.name}" }
     summary[:type] = event.type
     summary[:created_at] = event.created_at
     activities << summary
