@@ -73,21 +73,21 @@ end
 
 def upload(hash)
 
-  connection = Fog::Storage.new({
+  connection = Fog::Storage.new(
     provider: 'AWS',
     aws_access_key_id: ENV['ISAAC_S3_ID'],
     aws_secret_access_key: ENV['ISAAC_S3_KEY']
-  })
+  )
 
-  dir = connection.directories.get('isaac-as-a-service')
+  dir = connection.directories.get 'isaac-as-a-service'
 
   puts 'Uploading to S3'
-  dir.files.create({
+  dir.files.create(
     key: 'isaac.json',
     body: hash.to_json,
     public: true,
     content_type: 'application/json'
-  })
+  )
   puts 'Finished uploading'
 end
 
