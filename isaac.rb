@@ -11,7 +11,7 @@ def twitter
   end
 
   puts 'Requesting Twitter'
-  Twitter.user_timeline('icambron', exclude_replies: true, count: 30).each do |tweet|
+  Twitter.user_timeline('icambron', exclude_replies: true, count: 60).each do |tweet|
     tweets << {created_at: tweet.created_at, text: tweet.text, url: "https://twitter.com/icambron/status/#{tweet.id}"}
   end
   puts 'Processed Twitter'
