@@ -24,7 +24,7 @@ def github
   activities = []
 
   Github.configure do |config|
-    config.oauth_token = ENV['ISAAC_GITHUB_TOKEN']
+    config.basic_auth = ENV['ISAAC_GITHUB_TOKEN']
   end
 
   puts 'Requesting Github'
