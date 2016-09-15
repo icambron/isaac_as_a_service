@@ -5,13 +5,13 @@ Bundler.require
 def twitter
   tweets = []
 
-  Twitter.configure do |config|
+  client = Twitter::REST::Client.new do |config|
     config.consumer_key = ENV['ISAAC_TWITTER_KEY']
     config.consumer_secret = ENV['ISAAC_TWITTER_SECRET']
   end
 
   puts 'Requesting Twitter'
-  Twitter.user_timeline('icambron', exclude_replies: true, count: 60).each do |tweet|
+  client.user_timeline('icambron', exclude_replies: true, count: 60).each do |tweet|
     tweets << {created_at: tweet.created_at, text: tweet.text, url: "https://twitter.com/icambron/status/#{tweet.id}"}
   end
   puts 'Processed Twitter'
